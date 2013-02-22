@@ -71,4 +71,5 @@ if __name__ == '__main__':
     # actions for argv
     action_runserver = script.make_runserver(create_app, use_debugger=True, use_reloader=True)
     action_initdb = lambda: model.initdb(create_app().engine) 
+    action_shell = script.make_shell(lambda: {'blog': create_app()})
     script.run()
