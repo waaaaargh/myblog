@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+!/usr/bin/python2
 
 import os
 
@@ -24,6 +24,8 @@ class Blog(object):
 
         # set url maps
         from werkzeug.routing import Map, Rule
+        
+        # rules for URLs
         self.url_map = Map([
             Rule('/', endpoint='hello'),
         ])
@@ -60,8 +62,9 @@ def create_app(config_path='blog.cfg'):
 
 if __name__ == '__main__':
     from werkzeug import run_simple
-    app = create_app()
-    run_simple('localhost', 9001, app,
-        use_debugger=True,
-        use_reloader=True
-    )
+    from werkzeug import script
+
+    # actions for argv
+    action_runserver = script.make_runserver(create_app, use_debugger=True, use_reloader=True)
+    
+    script.run()
