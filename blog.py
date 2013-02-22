@@ -1,4 +1,4 @@
-!/usr/bin/python2
+#!/usr/bin/python2
 
 import os
 
@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from config import Configuration
 import views
+import model
 
 class Blog(object):
     """
@@ -16,6 +17,10 @@ class Blog(object):
         # load config
         self.config = Configuration()
         self.config.load_from_file(config_path)
+
+        # initialize sqlalchemy
+        from sqlalchemy import create_engine
+        self.engine = create_engine(self.config.database_uri)
 
         # initialize jinja templates
         self.jinja_env = Environment(
@@ -29,7 +34,6 @@ class Blog(object):
         self.url_map = Map([
             Rule('/', endpoint='hello'),
         ])
-
 
     """
     handle incoming WSGI requests.
@@ -66,5 +70,5 @@ if __name__ == '__main__':
 
     # actions for argv
     action_runserver = script.make_runserver(create_app, use_debugger=True, use_reloader=True)
-    
+    action_initdb = lambda: model.initdb(create_app().engine) 
     script.run()
