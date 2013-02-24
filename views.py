@@ -29,3 +29,12 @@ def list_posts_lastweek(request, environment, session):
 def post_details(request, environment, session, id):
     post_obj = session.query(post).filter(post.id == id).one()
     return {'post': post_obj}
+
+def admin_welcome(request, environment, session):
+    return {}
+
+def admin_create_post(request, environment, sessio):
+    if request.method == 'POST':
+        return {}
+    else:
+        return {}

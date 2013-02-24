@@ -3,6 +3,7 @@
 import os
 
 from werkzeug.wrappers import Request, Response
+from werkzeug.wsgi import SharedDataMiddleware
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy.orm import sessionmaker
 
@@ -39,6 +40,8 @@ class Blog(object):
             Rule('/posts/<int:year>/<int:month>', endpoint='list_posts_month'),
             Rule('/posts/<int:year>/<int:month>/<int:day>', endpoint='list_posts_day'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
+            Rule('/admin/', endpoint='admin_welcome'),
+            Rule('/admin/create', endpoint='admin_create_post'),
         ])
 
     """
@@ -70,8 +73,17 @@ class Blog(object):
     def __call__(self, environment, start_response):
         return self.handle_request(environment, start_response)
 
-def create_app(config_path='blog.cfg'):
-    return Blog(config_path)
+def create_app(config_path='blog.cfg', with_static=True):
+    app = Blog(config_path)
+    
+    # adds static directory serving if needed
+    #   In production content, leave the web serving 
+    #   to the _real_ web server instead of the 
+    #   werkzeug middleware.
+
+    app = SharedDataMiddleware(app, {'/static': 'static'})
+    
+    return app
 
 if __name__ == '__main__':
     from werkzeug import run_simple
