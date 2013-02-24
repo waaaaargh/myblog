@@ -16,6 +16,10 @@ class Blog(object):
     set up blog instance.
     """
     def __init__(self, config_path):
+        # set locales to german
+        import locale
+        locale.setlocale(locale.LC_TIME, 'de_DE.utf-8')
+
         # load config
         self.config = Configuration()
         self.config.load_from_file(config_path)

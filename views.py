@@ -33,8 +33,29 @@ def post_details(request, environment, session, id):
 def admin_welcome(request, environment, session):
     return {}
 
-def admin_create_post(request, environment, sessio):
-    if request.method == 'POST':
-        return {}
+def admin_create_post(request, environment, session):
+    if request.method != 'POST':
+        return {'success': None}
     else:
-        return {}
+        try:
+            title = request.form['title'] 
+            excerpt = request.form['excerpt'] 
+            content = request.form['content']
+        except KeyError, e:
+            return {'success': False, 'errorstring': 'BuggyHTML'}
+
+        if title == '':
+            return {'success': False, 'errorstring': 'MissingTitle'}
+        if content == '':
+            return {'success': False, 'errorstring': 'MissingPost'}
+
+        new = post()
+        new.title = title
+        new.excerpt = excerpt
+        new.content = content
+        new.date = datetime.now()        
+
+        session.add(new)
+        session.commit()
+        
+        return {'success': True}
