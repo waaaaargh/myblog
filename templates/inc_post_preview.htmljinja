@@ -1,0 +1,6 @@
+[<a href="/posts/post_{{post.id}}">#</a>] <b>{{post.title}}</b>:
+{% if post.excerpt != None %}
+    {{post.excerpt}}
+{% else %}
+    {{post.content}}
+{% endif %}

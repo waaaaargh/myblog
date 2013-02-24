@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>Hannes' Blog</title>
+    </head>
+
+    <body>
+        <h1>Hannes' Blog</h1>
+        <div><i>My stuffz</i></div>
+        <div align=right>Fragen? Antworten!</div>
+        <h2>{% block title %} {% endblock %}</h2>
+        
+        {% block content %}
+        {% endblock %}
+        <hr>
+        <div align="right">Bydon Bowerd :DDDDDDDDD</div>
+    </body>
+</html>
