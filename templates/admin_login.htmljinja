@@ -1,0 +1,18 @@
+{% extends "layout.htmljinja" %}
+
+{% block title %}
+Admin Login
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="">
+    <input type="text" name="username"><br>
+    <input type="password" name="password"><br>
+    <input type="submit">
+</form><br>
+{% if success == True %}
+Login successfull. You may now proceed to the <a href="/admin">Admin Area</a>
+{% elif success == False %}
+Login failed!
+{% endif %}
+{% endblock %}

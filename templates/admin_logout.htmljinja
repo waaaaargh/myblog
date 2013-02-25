@@ -1,0 +1,7 @@
+{% extends "layout.htmljinja" %}
+{% block title %}
+Logout successfull!
+{% endblock %}
+{% block content%}
+kthxbai
+{% endblock %}

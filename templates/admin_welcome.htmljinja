@@ -1,0 +1,16 @@
+{% extends "layout.htmljinja" %}
+
+{% block title %}
+Welcome!
+{% endblock %}
+
+{% block content %}
+<p><a href="/admin/create">create new post</a></p>
+
+<b>Posts:</b>
+<ul>
+{% for post in posts %}
+<li><b>{{post.title}}</b> ({{post.date.strftime("%c")}}) <a href="/admin/edit/{{post.id}}">[edit]</a> <a href="/admin/delete/{{post.id}}">[delete]</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "layout.htmljinja" %}
+{% block title %}
+    Post anlegen
+{% endblock %}
+
+{% block content %}
+    <script type="text/javascript" src="/static/nicedit/nicEdit.js"></script>
+    <script>
+    var inputarea;
+
+    function source() {
+        inputarea = inputarea.removeInstance('inputarea');
+    }
+
+    function visual() {
+        inputarea =  new nicEditor({fullPanel : true, iconsPath : '/static/nicedit/nicEditorIcons.gif'}).panelInstance('inputarea',{hasPanel : true});
+    }
+
+    </script>
+    <form method="POST" action="">
+        <input type="text" name="title" value="{{post.title}}"><br>
+        <input type="text" name="excerpt" value="{{post.excerpt}}"><br>
+        <textarea name="content" style="width: 100%; height: 400px;" id="inputarea">{{post.content}}</textarea><br>
+        <a href="#" onclick="visual();">visual</a> <a href="#" onclick="source();">source</a>&nbsp;
+        <input type="submit">
+    </form>
+    {% if success==True%}
+        Post successfull 
+    {% elif success==None %}
+    {% else %}
+        Error on adding Post: {{errorstring}}
+    {% endif %}
+{% endblock %}

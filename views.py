@@ -4,10 +4,29 @@ from model import post
 
 from sqlalchemy.sql.expression import between
 
+"""
+only executes the decorated function if performed by an authorized user via beaker session
+Throws Exception('NotAuthenticated') if user is not authorized
+"""
+def authenticated(function):
+    def inner(*args, **kwargs):
+        # userame checking goes here
+        try:
+            username_session = args[1]['beaker.session']['username']      
+        except KeyError, e:
+            raise Exception('NotAuthenticated')
+
+        ret = function(*args, **kwargs)
+        
+        return ret
+
+    return inner
+
 def list_posts_year(request, environment, session, year):
     upperbound = datetime(year+1, 1, 1)
     lowerbound = datetime(year, 1, 1)
-    posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).all()
+    posts = session.query(post).filter(between(
+        post.date, lowerbound, upperbound)).all()
     return {'posts': posts, 'year': year} 
 
 def list_posts_month(request, environment, session, year, month):
@@ -32,9 +51,48 @@ def post_details(request, environment, session, id):
     post_obj = session.query(post).filter(post.id == id).one()
     return {'post': post_obj}
 
-def admin_welcome(request, environment, session):
-    return {}
+"""
+attempt login and write username into session if successfull
 
+returns
+    * success: False if login was not successfull
+    * success: True if login was successfull
+    * success: None if the login has not been performed yet
+
+errorstring may be:
+    * 'InvalidLogin', if username/password combination is unknown
+"""
+def admin_login(request, environment, session):
+    if request.method != 'POST':
+        return {'success': None}
+    else:
+        try:
+            username = request.form['username']
+            password = request.form['password']
+        except KeyError, e:
+            raise Exception('BuggyHTML')
+
+        if username == 'johannes' and password == 'password':
+            http_session = environment['beaker.session']
+            http_session['username'] = username
+            http_session.save()
+            return {'success': True} 
+        else: 
+            return {'success': False, 'errorstring': 'InvalidLogin'}
+
+
+def admin_logout(request, environment, session):
+    http_session = environment['beaker.session']
+    http_session.delete()
+    return {'success': True}
+
+"""
+Displays a list of all posts
+"""
+@authenticated
+def admin_welcome(request, environment, session):
+    posts = session.query(post).all()
+    return {'posts': posts}
 
 """
 Creates a post.
@@ -50,6 +108,7 @@ errortype may be:
     * 'MissongContent' if no content has been passed
     * 'BuggyHTML' if something is wrong with the form.
 """
+@authenticated
 def admin_create_post(request, environment, session):
     if request.method != 'POST':
         return {'success': None}
@@ -82,3 +141,71 @@ def admin_create_post(request, environment, session):
         session.commit()
         
         return {'success': True}
+
+"""
+Opens the post <post_id> for editing and saves it.
+
+returns:
+    * success: True if the post has been created successfully
+    * success: False and an errorstring if anything has gone
+        wrong.
+    * success: None, if no action has been performed at all.
+
+errortype may be:
+    * 'MissingTitle' if no title has been passed
+    * 'MissongContent' if no content has been passed
+    * 'BuggyHTML' if something is wrong with the form.
+
+may throw:
+    * 
+"""
+@authenticated
+def admin_edit_post(request, environment, session, post_id):
+        # get post Object
+        post_obj = session.query(post).filter(post.id == post_id).one()
+
+        if request.method != 'POST':
+            return {'success': None, 'post': post_obj}
+        else:
+            try:
+                title = request.form['title'] 
+                excerpt = request.form['excerpt'] 
+                content = request.form['content']
+            except KeyError, e:
+                return {'success': False, 'errorstring': 'BuggyHTML'}
+
+            # check if at least title and content are present.
+            if title == '':
+                return {'success': False, 'errorstring': 'MissingTitle'}
+            if content == '':
+                return {'success': False, 'errorstring': 'MissingPost'}
+
+            # if we don't have an excerpt, we want the field to be not set at all.
+            if excerpt == '':
+                excerpt = None
+            
+            post_obj.title = title
+            post_obj.excerpt = excerpt
+            post_obj.content = content
+
+            session.commit()
+            
+            return {'success': True, 'post': post_obj}
+
+"""
+deletes the post with the id <post_id>.
+
+returns:
+    * success: True if the post has been deleted successfully
+    * success: False and an errorstring if anything has gone
+        wrong.
+throws:
+    * Exception('NoSuchPost') if there is no post with <post_id>
+
+"""
+@authenticated
+def admin_delete_post(request, environment, session, post_id):
+    post_obj = session.query(post).filter(post.id == post_id).one()
+    session.delete(post_obj)
+    session.commit()
+    return {'success': True}
