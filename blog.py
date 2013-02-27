@@ -45,6 +45,7 @@ class Blog(object):
             Rule('/posts/<int:year>/<int:month>', endpoint='list_posts_month'),
             Rule('/posts/<int:year>/<int:month>/<int:day>', endpoint='list_posts_day'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
+            Rule('/rss', endpoint='rss'),
             Rule('/admin', endpoint='admin_welcome'),
             Rule('/admin/logout', endpoint='admin_logout'),
             Rule('/admin/login', endpoint='admin_login'),
@@ -64,6 +65,9 @@ class Blog(object):
         
         # prepare sqlalchemy session
         session = self.session_factory()        
+
+        # put config in environment variable
+        environment['blog.config'] = self.config
 
         # execute views
         d = getattr(views, endpoint)(request, environment, session, **values)

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Hannes' Blog</title>
+  <link>http://blog.weltraumpflege.org</link>
+  <description>Dem Hannes sein Blog</description>
+  {% for post in posts %}
+  <item>
+    <title>{{post.title}}</title>
+    <link>http://blog.weltraumpflege.org/posts/post_{{post.id}}</link>
+    <description>{% if post.excerpt %}{{post.excerpt}}{% else %}{{post.content|striptags}}{% endif %}</description>
+  </item>
+  {% endfor %}
+</channel>
+
+</rss>
