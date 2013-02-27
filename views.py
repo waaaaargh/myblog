@@ -51,6 +51,10 @@ def post_details(request, environment, session, id):
     post_obj = session.query(post).filter(post.id == id).one()
     return {'post': post_obj}
 
+def rss(request, environment, session):
+    posts = session.query(post).limit(20)
+    return {'posts': posts}
+
 """
 attempt login and write username into session if successfull
 
@@ -72,7 +76,7 @@ def admin_login(request, environment, session):
         except KeyError, e:
             raise Exception('BuggyHTML')
 
-        if username == 'johannes' and password == 'password':
+        if username == environment['blog.config'].username and password == environment['blog.config'].password:
             http_session = environment['beaker.session']
             http_session['username'] = username
             http_session.save()
