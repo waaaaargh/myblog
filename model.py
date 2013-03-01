@@ -11,6 +11,13 @@ class post(Base):
     content = Column(String)
     date = Column(DateTime)
 
+class page(Base):
+    __tablename__ = 'pages'
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    content = Column(String)
+    lastmodified = Column(DateTime)
+
 """
 Creates all the tables in the <engine> database.
 """

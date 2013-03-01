@@ -41,6 +41,7 @@ class Blog(object):
         # rules for URLs
         self.url_map = Map([
             Rule('/', endpoint='list_posts_lastweek'),
+            Rule('/page/<int:page_id>', endpoint='show_page'),
             Rule('/posts/<int:year>', endpoint='list_posts_year'),
             Rule('/posts/<int:year>/<int:month>', endpoint='list_posts_month'),
             Rule('/posts/<int:year>/<int:month>/<int:day>', endpoint='list_posts_day'),
@@ -49,9 +50,12 @@ class Blog(object):
             Rule('/admin', endpoint='admin_welcome'),
             Rule('/admin/logout', endpoint='admin_logout'),
             Rule('/admin/login', endpoint='admin_login'),
-            Rule('/admin/create', endpoint='admin_create_post'),
-            Rule('/admin/edit/<int:post_id>', endpoint='admin_edit_post'),
-            Rule('/admin/delete/<int:post_id>', endpoint='admin_delete_post'),
+            Rule('/admin/posts/create', endpoint='admin_create_post'),
+            Rule('/admin/posts/edit/<int:post_id>', endpoint='admin_edit_post'),
+            Rule('/admin/posts/delete/<int:post_id>', endpoint='admin_delete_post'),
+            Rule('/admin/pages/create', endpoint='admin_create_page'),
+            Rule('/admin/pages/edit/<int:page_id>', endpoint='admin_edit_page'),
+            Rule('/admin/pages/delete/<int:page_id>', endpoint='admin_delete_page'),
         ])
 
     """
@@ -104,6 +108,6 @@ if __name__ == '__main__':
 
     # actions for argv
     action_runserver = script.make_runserver(create_app, use_debugger=True, use_reloader=True)
-    action_initdb = lambda: model.initdb(create_app().engine) 
-    action_shell = script.make_shell(lambda: {'blog': create_app()})
+    action_initdb = lambda: model.initdb(Blog(config_path='blog.cfg').engine) 
+    action_shell = script.make_shell(lambda: {'blog': Blog(config_path='blog.cfg')}) 
     script.run()

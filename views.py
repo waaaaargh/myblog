@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
-from model import post
+from model import post, page
 
-from sqlalchemy.sql.expression import between
+from sqlalchemy.sql.expression import between, desc
 
 """
 only executes the decorated function if performed by an authorized user via beaker session
@@ -44,7 +44,7 @@ def list_posts_day(request, environment, session, month, year, day):
 def list_posts_lastweek(request, environment, session):
     upperbound = datetime.now()
     lowerbound = upperbound - timedelta(days=7)
-    posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).all()
+    posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).order_by(desc(post.date)).all()
     return {'posts': posts}
 
 def post_details(request, environment, session, id):
@@ -54,6 +54,10 @@ def post_details(request, environment, session, id):
 def rss(request, environment, session):
     posts = session.query(post).limit(20)
     return {'posts': posts}
+
+def show_page(request, environment, session, page_id):
+    page_obj = session.query(page).filter(page.id == page_id).one()
+    return {'page': page}
 
 """
 attempt login and write username into session if successfull
@@ -96,7 +100,9 @@ Displays a list of all posts
 @authenticated
 def admin_welcome(request, environment, session):
     posts = session.query(post).all()
-    return {'posts': posts}
+    pages = session.query(page).all()
+    return {'posts': posts, 'pages': pages}
+    raise Exception('nigger')
 
 """
 Creates a post.
@@ -211,5 +217,110 @@ throws:
 def admin_delete_post(request, environment, session, post_id):
     post_obj = session.query(post).filter(post.id == post_id).one()
     session.delete(post_obj)
+    session.commit()
+    return {'success': True}
+
+"""
+Creates a page.
+
+returns:
+    * success: True if the page has been created successfully
+    * success: False and an errorstring if anything has gone
+        wrong.
+    * success: None, if no action has been performed at all.
+
+errortype may be:
+    * 'MissingTitle' if no title has been passed
+    * 'MissongContent' if no content has been passed
+    * 'BuggyHTML' if something is wrong with the form.
+"""
+@authenticated
+def admin_create_page(request, environment, session):
+    if request.method != 'POST':
+        return {'success': None}
+    else:
+        try:
+            title = request.form['title'] 
+            content = request.form['content']
+        except KeyError, e:
+            return {'success': False, 'errorstring': 'BuggyHTML'}
+
+        # check if at least title and content are present.
+        if title == '':
+            return {'success': False, 'errorstring': 'MissingTitle'}
+        if content == '':
+            return {'success': False, 'errorstring': 'MissingPost'}
+
+        new = page()
+        new.title = title
+        new.content = content
+
+        new.lastmodified = datetime.now()        
+
+        session.add(new)
+        session.commit()
+        
+        return {'success': True}
+
+"""
+Opens the page <page_id> for editing and saves it.
+
+returns:
+    * success: True if the post has been created successfully
+    * success: False and an errorstring if anything has gone
+        wrong.
+    * success: None, if no action has been performed at all.
+
+errortype may be:
+    * 'MissingTitle' if no title has been passed
+    * 'MissongContent' if no content has been passed
+    * 'BuggyHTML' if something is wrong with the form.
+
+may throw:
+    * 
+"""
+@authenticated
+def admin_edit_page(request, environment, session, page_id):
+        # get page Object
+        page_obj = session.query(page).filter(page.id == page_id).one()
+
+        if request.method != 'POST':
+            return {'success': None, 'page': page_obj}
+        else:
+            try:
+                title = request.form['title'] 
+                excerpt = request.form['excerpt'] 
+                content = request.form['content']
+            except KeyError, e:
+                return {'success': False, 'errorstring': 'BuggyHTML'}
+
+            # check if at least title and content are present.
+            if title == '':
+                return {'success': False, 'errorstring': 'MissingTitle'}
+            if content == '':
+                return {'success': False, 'errorstring': 'MissingContent'}
+            
+            page_obj.title = title
+            page_obj.content = content
+
+            session.commit()
+            
+            return {'success': True, 'page': page_obj}
+
+"""
+deletes the page with the id <page_id>.
+
+returns:
+    * success: True if the post has been deleted successfully
+    * success: False and an errorstring if anything has gone
+        wrong.
+throws:
+    * Exception('NoSuchPage') if there is no post with <post_id>
+
+"""
+@authenticated
+def admin_delete_page(request, environment, session, page_id):
+    page_obj = session.query(page).filter(page.id == page_id).one()
+    session.delete(page_obj)
     session.commit()
     return {'success': True}

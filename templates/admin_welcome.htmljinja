@@ -5,12 +5,19 @@ Welcome!
 {% endblock %}
 
 {% block content %}
-<p><a href="/admin/create">create new post</a></p>
+<h3>Pages</h3>
+<ul>
+{% for page in pages %}
+<li> <b>{{page.title}}</b> <a href="/admin/pages/edit/{{page.id}}">[edit]</a> [delete]
+{% endfor %}
+</ul>
+<p><a href="/admin/pages/create">create new page</a></p>
 
-<b>Posts:</b>
+<h3>Posts</h3>
 <ul>
 {% for post in posts %}
 <li><b>{{post.title}}</b> ({{post.date.strftime("%c")}}) <a href="/admin/edit/{{post.id}}">[edit]</a> <a href="/admin/delete/{{post.id}}">[delete]</a></li>
 {% endfor %}
 </ul>
+<p><a href="/admin/posts/create">create new post</a></p>
 {% endblock %}

@@ -1,0 +1,8 @@
+{% extends "layout.htmljinja" %}
+{% block title %}
+{{page.title}}
+{% endblock %}
+{% block content %}
+{{page.content}}
+<p><i>{{page.lastmodified.strftime("%A, %d. %B %Y, %H:%M")}}</i></p>
+{% endblock %}

@@ -3,4 +3,4 @@
     {{post.excerpt}}
 {% else %}
     {{post.content}}
-{% endif %}
+{% endif %} ({{post.date.strftime("%c")}})
