@@ -57,7 +57,7 @@ def rss(request, environment, session):
 
 def show_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()
-    return {'page': page}
+    return {'page': page_obj}
 
 """
 attempt login and write username into session if successfull
@@ -289,7 +289,6 @@ def admin_edit_page(request, environment, session, page_id):
         else:
             try:
                 title = request.form['title'] 
-                excerpt = request.form['excerpt'] 
                 content = request.form['content']
             except KeyError, e:
                 return {'success': False, 'errorstring': 'BuggyHTML'}
@@ -304,7 +303,6 @@ def admin_edit_page(request, environment, session, page_id):
             page_obj.content = content
 
             session.commit()
-            
             return {'success': True, 'page': page_obj}
 
 """
