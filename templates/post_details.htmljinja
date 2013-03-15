@@ -5,5 +5,5 @@
 {% block content %}
 {% if post.excerpt != None %}<p>{{post.excerpt}}</p>{% endif%}
 {{post.content}}
-<p><i>{{post.date.strftime("%A, %d. %B %Y, %H:%M")}}</i></p>
+<p><i>{{post.date.strftime("%A, %d. %B %Y, %H:%M").decode('utf-8')}}</i></p>
 {% endblock %}

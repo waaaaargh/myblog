@@ -1,78 +1,51 @@
 from datetime import datetime, timedelta
+from sqlalchemy.sql.expression import between, desc
+from werkzeug.utils import redirect 
 
+from util import render_template
 from model import post, page
 
-from sqlalchemy.sql.expression import between, desc
-
-"""
-only executes the decorated function if performed by an authorized user via beaker session
-Throws Exception('NotAuthenticated') if user is not authorized
-"""
 def authenticated(function):
+    """
+    only executes the decorated function if performed by an authorized user via beaker session
+    Throws Exception('NotAuthenticated') if user is not authorized
+    """
     def inner(*args, **kwargs):
         # userame checking goes here
         try:
             username_session = args[1]['beaker.session']['username']      
+            ret = function(*args, **kwargs)
+            return ret
         except KeyError, e:
-            raise Exception('NotAuthenticated')
-
-        ret = function(*args, **kwargs)
+            return redirect('/admin/login')
         
-        return ret
 
     return inner
-
-def list_posts_year(request, environment, session, year):
-    upperbound = datetime(year+1, 1, 1)
-    lowerbound = datetime(year, 1, 1)
-    posts = session.query(post).filter(between(
-        post.date, lowerbound, upperbound)).all()
-    return {'posts': posts, 'year': year} 
-
-def list_posts_month(request, environment, session, year, month):
-    upperbound = datetime(year, month+1, 1)
-    lowerbound = datetime(year, month, 1)
-    posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).all()
-    return {'posts': posts, 'month': month, 'year': year} 
-
-def list_posts_day(request, environment, session, month, year, day):
-    upperbound = datetime(year, month, day + 1)
-    lowerbound = datetime(year, month, day)
-    posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).all()
-    return {'posts': posts, 'day': day, 'month': month, 'year': year}
 
 def list_posts_lastweek(request, environment, session):
     upperbound = datetime.now()
     lowerbound = upperbound - timedelta(days=7)
     posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).order_by(desc(post.date)).all()
-    return {'posts': posts}
+    return render_template("list_posts_lastweek.htmljinja", environment, posts=posts)
 
 def post_details(request, environment, session, id):
     post_obj = session.query(post).filter(post.id == id).one()
-    return {'post': post_obj}
+    return render_template("post_details.htmljinja", environment, post=post_obj)
 
 def rss(request, environment, session):
     posts = session.query(post).limit(20)
-    return {'posts': posts}
+    return render_template("rss.htmljinja", environment, mimetype='application/rss+xml', posts=posts)
 
 def show_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()
-    return {'page': page_obj}
+    return render_template("show_page.htmljinja", environment)
 
-"""
-attempt login and write username into session if successfull
-
-returns
-    * success: False if login was not successfull
-    * success: True if login was successfull
-    * success: None if the login has not been performed yet
-
-errorstring may be:
-    * 'InvalidLogin', if username/password combination is unknown
-"""
 def admin_login(request, environment, session):
+    """
+    attempt login and write username into session if successfull
+    """
     if request.method != 'POST':
-        return {'success': None}
+        return render_template("admin_login.htmljinja", environment, success=None) 
     else:
         try:
             username = request.form['username']
@@ -84,9 +57,9 @@ def admin_login(request, environment, session):
             http_session = environment['beaker.session']
             http_session['username'] = username
             http_session.save()
-            return {'success': True} 
-        else: 
-            return {'success': False, 'errorstring': 'InvalidLogin'}
+            return redirect("/admin")
+        else:
+            return render_template("admin_login.htmljinja", environment, success=False,errorstring='InvalidLogin') 
 
 
 def admin_logout(request, environment, session):
@@ -101,9 +74,7 @@ Displays a list of all posts
 def admin_welcome(request, environment, session):
     posts = session.query(post).all()
     pages = session.query(page).all()
-    return {'posts': posts, 'pages': pages}
-    raise Exception('nigger')
-
+    return render_template("admin_welcome.htmljinja", environment, posts=posts, pages=pages) 
 """
 Creates a post.
 
@@ -121,20 +92,19 @@ errortype may be:
 @authenticated
 def admin_create_post(request, environment, session):
     if request.method != 'POST':
-        return {'success': None}
+        return render_template("admin_create_post.htmljinja", environment, success=None)
     else:
         try:
             title = request.form['title'] 
             excerpt = request.form['excerpt'] 
             content = request.form['content']
         except KeyError, e:
-            return {'success': False, 'errorstring': 'BuggyHTML'}
-
+            raise Exception('BuggyHTML')
         # check if at least title and content are present.
         if title == '':
-            return {'success': False, 'errorstring': 'MissingTitle'}
+            return render_template("admin_create_post.htmljinja", environment, success=False, errorstring='MissingTitle')
         if content == '':
-            return {'success': False, 'errorstring': 'MissingPost'}
+            return render_template("admin_create_post.htmljinja", environment, success=False, errorstring='MissingPost')
 
         # if we don't have an excerpt, we want the field to be not set at all.
         if excerpt == '':
@@ -149,8 +119,7 @@ def admin_create_post(request, environment, session):
 
         session.add(new)
         session.commit()
-        
-        return {'success': True}
+        return redirect("/admin") 
 
 """
 Opens the post <post_id> for editing and saves it.
@@ -175,20 +144,19 @@ def admin_edit_post(request, environment, session, post_id):
         post_obj = session.query(post).filter(post.id == post_id).one()
 
         if request.method != 'POST':
-            return {'success': None, 'post': post_obj}
+            return render_template("admin_edit_post.htmljinja", environment, success=None, post=post_obj)
         else:
             try:
                 title = request.form['title'] 
                 excerpt = request.form['excerpt'] 
                 content = request.form['content']
             except KeyError, e:
-                return {'success': False, 'errorstring': 'BuggyHTML'}
-
+                raise Exception('BuggyHTML')
             # check if at least title and content are present.
             if title == '':
-                return {'success': False, 'errorstring': 'MissingTitle'}
+                return render_template("admin_edit_post.htmljinja", environment, success=False, errorstring='MissingHTML')
             if content == '':
-                return {'success': False, 'errorstring': 'MissingPost'}
+                return render_template("admin_edit_post.htmljinja", environment, success=False, errorstring='MissingTitle')
 
             # if we don't have an excerpt, we want the field to be not set at all.
             if excerpt == '':
@@ -199,8 +167,7 @@ def admin_edit_post(request, environment, session, post_id):
             post_obj.content = content
 
             session.commit()
-            
-            return {'success': True, 'post': post_obj}
+            return redirect("/admin")
 
 """
 deletes the post with the id <post_id>.
@@ -218,8 +185,7 @@ def admin_delete_post(request, environment, session, post_id):
     post_obj = session.query(post).filter(post.id == post_id).one()
     session.delete(post_obj)
     session.commit()
-    return {'success': True}
-
+    return redirect("/admin")
 """
 Creates a page.
 
@@ -237,19 +203,25 @@ errortype may be:
 @authenticated
 def admin_create_page(request, environment, session):
     if request.method != 'POST':
-        return {'success': None}
+        return render_template("admin_create_page.htmljinja", environment, success=None)
     else:
         try:
             title = request.form['title'] 
             content = request.form['content']
         except KeyError, e:
-            return {'success': False, 'errorstring': 'BuggyHTML'}
+            raise Exception('BuggyHTML')
 
         # check if at least title and content are present.
         if title == '':
-            return {'success': False, 'errorstring': 'MissingTitle'}
+            return render_template("admin_create_page.htmljinja", environment, 
+                success=False,
+                errorstring='MissingTitle'
+            )
         if content == '':
-            return {'success': False, 'errorstring': 'MissingPost'}
+            return render_template("admin_create_page.htmljinja", environment, 
+                success=False,
+                errorstring='MissingContent'
+        )
 
         new = page()
         new.title = title
@@ -260,8 +232,7 @@ def admin_create_page(request, environment, session):
         session.add(new)
         session.commit()
         
-        return {'success': True}
-
+        return redirect('/admin')
 """
 Opens the page <page_id> for editing and saves it.
 
@@ -285,25 +256,32 @@ def admin_edit_page(request, environment, session, page_id):
         page_obj = session.query(page).filter(page.id == page_id).one()
 
         if request.method != 'POST':
-            return {'success': None, 'page': page_obj}
+            return render_template("admin_edit_page.htmljinja", environment, success=None, page=page_obj)
         else:
             try:
                 title = request.form['title'] 
                 content = request.form['content']
             except KeyError, e:
-                return {'success': False, 'errorstring': 'BuggyHTML'}
+                raise Exception('BuggyHTML')
 
             # check if at least title and content are present.
             if title == '':
-                return {'success': False, 'errorstring': 'MissingTitle'}
+                return render_template("admin_edit_page.htmljinja", environment,
+                    success=False,
+                    errorstring='MissingTitle',
+                    page=page_obj
+                )
             if content == '':
-                return {'success': False, 'errorstring': 'MissingContent'}
-            
+                return render_template("admin_edit_page.htmljinja", environment,
+                    success=False,
+                    errorstring='MissingContent',
+                    page=page_obj
+                )
             page_obj.title = title
             page_obj.content = content
 
             session.commit()
-            return {'success': True, 'page': page_obj}
+            return redirect("/admin")
 
 """
 deletes the page with the id <page_id>.
@@ -321,4 +299,4 @@ def admin_delete_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()
     session.delete(page_obj)
     session.commit()
-    return {'success': True}
+    return redirect("/admin")

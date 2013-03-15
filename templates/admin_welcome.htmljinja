@@ -8,7 +8,7 @@ Welcome!
 <h3>Pages</h3>
 <ul>
 {% for page in pages %}
-<li> <b>{{page.title}}</b> <a href="/admin/pages/edit/{{page.id}}">[edit]</a> [delete]
+<li> <b>{{page.title}}</b> <a href="/admin/pages/edit/{{page.id}}">[edit]</a> <a href="/admin/pages/delete/{{page.id}}">[delete]</a>
 {% endfor %}
 </ul>
 <p><a href="/admin/pages/create">create new page</a></p>
@@ -16,7 +16,7 @@ Welcome!
 <h3>Posts</h3>
 <ul>
 {% for post in posts %}
-<li><b>{{post.title}}</b> ({{post.date.strftime("%c")}}) <a href="/admin/edit/{{post.id}}">[edit]</a> <a href="/admin/delete/{{post.id}}">[delete]</a></li>
+<li><b>{{post.title}}</b> ({{post.date.strftime("%c").decode('utf-8')}}) <a href="/admin/posts/edit/{{post.id}}">[edit]</a> <a href="/admin/posts/delete/{{post.id}}">[delete]</a></li>
 {% endfor %}
 </ul>
 <p><a href="/admin/posts/create">create new post</a></p>

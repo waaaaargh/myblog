@@ -42,9 +42,6 @@ class Blog(object):
         self.url_map = Map([
             Rule('/', endpoint='list_posts_lastweek'),
             Rule('/page/<int:page_id>', endpoint='show_page'),
-            Rule('/posts/<int:year>', endpoint='list_posts_year'),
-            Rule('/posts/<int:year>/<int:month>', endpoint='list_posts_month'),
-            Rule('/posts/<int:year>/<int:month>/<int:day>', endpoint='list_posts_day'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
             Rule('/rss', endpoint='rss'),
             Rule('/admin', endpoint='admin_welcome'),
@@ -70,18 +67,12 @@ class Blog(object):
         # prepare sqlalchemy session
         session = self.session_factory()        
 
-        # put config in environment variable
+        # put config and jinja environment in environment variable
         environment['blog.config'] = self.config
+        environment['blog.jinja_env'] = self.jinja_env
 
         # execute views
-        d = getattr(views, endpoint)(request, environment, session, **values)
-        
-        # get and render template
-        template = self.jinja_env.get_template( endpoint+'.htmljinja' )
-        output = template.render(**d)
-
-        # wsgi janitoring
-        response = Response(output, mimetype='text/html')
+        response = getattr(views, endpoint)(request, environment, session, **values)
         return response(environment, start_response) 
     
     """
