@@ -18,8 +18,6 @@ def authenticated(function):
             return ret
         except KeyError, e:
             return redirect('/admin/login')
-        
-
     return inner
 
 def list_posts_lastweek(request, environment, session):
