@@ -36,7 +36,7 @@ def rss(request, environment, session):
 
 def show_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()
-    return render_template("show_page.htmljinja", environment)
+    return render_template("show_page.htmljinja", environment, page=page_obj)
 
 def admin_login(request, environment, session):
     """
