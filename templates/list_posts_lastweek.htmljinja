@@ -5,7 +5,7 @@ Die letzten 7 Tage
 {% endblock %}
 
 {% block content %}
-<ul>
+<ul class="postlist">
 {% for post in posts %}
 <li>{% include "inc_post_preview.htmljinja" %}</li>
 {% endfor %}

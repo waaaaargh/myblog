@@ -2,19 +2,21 @@
     <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss" />
         <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
-
+        <link rel="stylesheet" href="/static/blog.css" type="text/css">
         <title>Hannes' Blog</title>
     </head>
 
     <body>
+        <div class="page">
         <h1>Hannes' Blog</h1>
-        <div><i>My stuffz</i></div>
-        <div align=right>Fragen? Antworten!</div>
-        <h2>{% block title %} {% endblock %}</h2>
-        
+        <div class="subtitle">the inner workings of an unconventional mind.</div>
+        <div class="pagelist">Fragen? Antworten!</div>
+        <div class="heading"><h2>{% block title %} {% endblock %}</h2></div>
+        <div class="content">
         {% block content %}
         {% endblock %}
-        <hr>
-        <div align="right">Bydon Bowerd :DDDDDDDDD</div>
+        </div>
+        <div class="footer">Bydon Bowerd :DDDDDDDDD</div>
+        </div>
     </body>
 </html>
