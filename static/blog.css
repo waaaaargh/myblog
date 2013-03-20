@@ -5,10 +5,12 @@
 
 @font-face {
     font-family: text;
-    src: url("/static/NoticiaText-Regular.ttf")
+    src: url("/static/NoticiaText-Regular.ttf");
 }
+
 body {
     font-family: text;
+    font-size: 12pt;
 }
 
 h1 {
@@ -19,6 +21,11 @@ h1 {
 
 h2 {
     font-family: heading;
+}
+
+h4 {
+    font-family: heading;
+    margin-bottom: 0px;
 }
 
 .page {
@@ -47,4 +54,19 @@ h2 {
 .footer {
     bottom: 1px;
     right: 1px;
+}
+
+.post {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+.post-preview {
+    font-family: text;
+    margin-top: 0px;
+    font-size: 12pt;
+}
+.post-date {
+    font-family: text;
+    text-align: right;
+    font-style: italic;
 }
