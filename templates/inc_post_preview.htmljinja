@@ -1,6 +1,7 @@
-<a href="/posts/post_{{post.id}}"><b>{{post.title}}</b><a>:
-{% if post.excerpt != None %}
+<a href="/posts/post_{{post.id}}"><h4>{{post.title}}</h4><a>
+<p class="post-preview">{% if post.excerpt != None %}
     {{post.excerpt}}
 {% else %}
     {{post.content}}
-{% endif %} ({{post.date.strftime("%c").decode('utf-8')}})
+{% endif %}</p>
+<p class="post-date">({{post.date.strftime("%c").decode('utf-8')}})</p>

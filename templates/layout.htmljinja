@@ -9,7 +9,10 @@
     <body>
         <div class="page">
         <h1>Hannes' Blog</h1>
-        <div class="subtitle">the inner workings of an unconventional mind.</div>
+        <div class="subtitle">
+		<p>the inner workings of an unconventional mind.</p>
+		<p><img width="100px" height="120px" src="/static/kallisti.png"></p>
+	</div>
         <div class="pagelist">Fragen? Antworten!</div>
         <div class="heading"><h2>{% block title %} {% endblock %}</h2></div>
         <div class="content">
