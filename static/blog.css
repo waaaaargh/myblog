@@ -1,0 +1,50 @@
+@font-face {
+    font-family: heading;
+    src: url("/static/Pacaya.otf") format("opentype"); 
+}
+
+@font-face {
+    font-family: text;
+    src: url("/static/NoticiaText-Regular.ttf")
+}
+body {
+    font-family: text;
+}
+
+h1 {
+    font-family: heading;
+    text-align: center;
+    margin-bottom: 0px;
+}
+
+h2 {
+    font-family: heading;
+}
+
+.page {
+    width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    height:100%;
+}
+
+.subtitle {
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 23px;
+}
+
+.pagelist {
+    text-align: center;
+}
+
+.postlist {
+    list-style: none;
+    padding-left: 0em;
+    margin-left: 0em;
+}
+ 
+.footer {
+    bottom: 1px;
+    right: 1px;
+}
