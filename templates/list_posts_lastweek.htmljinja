@@ -10,4 +10,5 @@
 <li class="post">{% include "inc_post_preview.htmljinja" %}</li>
 {% endfor %}
 </ul>
+<center>{% if older > 0 %} <a href="/prev/{{page+1}}">älter</a> {% endif %} {% if newer > 0 and older > 0 %} ~ {% endif %}{% if newer > 0 %} <a href="/prev/{{page- 1}}">neuer</a> {% endif %}</center>
 {% endblock %}

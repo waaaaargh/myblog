@@ -23,7 +23,7 @@
         {% block content %}
         {% endblock %}
         </div>
-        <div class="footer">Bydon Bowerd :DDDDDDDDD</div>
+        <div class="footer"><a href="/static/bydon.png">Bydon Bowerd :DDDDD</a> ~ <a href="http://twitter.com/waaaaargh">twitter</a> ~ <a href="http://waaaaargh.soup.io">soup.io</a></div>
         </div>
     </body>
 </html>
