@@ -3,6 +3,7 @@
 import os
 
 from werkzeug.wrappers import Request, Response
+from werkzeug.routing import Map, Rule
 from werkzeug.wsgi import SharedDataMiddleware
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy.orm import sessionmaker
@@ -34,13 +35,10 @@ class Blog(object):
         self.jinja_env = Environment(
             loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
         )
-
-        # set url maps
-        from werkzeug.routing import Map, Rule
         
         # rules for URLs
         self.url_map = Map([
-            Rule('/', endpoint='list_posts_lastweek'),
+            Rule('/', endpoint='list_last_posts'),
             Rule('/page/<int:page_id>', endpoint='show_page'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
             Rule('/rss', endpoint='rss'),

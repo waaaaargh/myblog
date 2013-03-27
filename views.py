@@ -20,10 +20,8 @@ def authenticated(function):
             return redirect('/admin/login')
     return inner
 
-def list_posts_lastweek(request, environment, session):
-    upperbound = datetime.now()
-    lowerbound = upperbound - timedelta(days=7)
-    posts = session.query(post).filter(between(post.date, lowerbound, upperbound)).order_by(desc(post.date)).all()
+def list_last_posts(request, environment, session):
+    posts = session.query(post).order_by(desc(post.date)).limit(20).all()
     return render_template("list_posts_lastweek.htmljinja", environment, posts=posts)
 
 def post_details(request, environment, session, id):
