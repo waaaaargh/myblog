@@ -39,6 +39,7 @@ class Blog(object):
         # rules for URLs
         self.url_map = Map([
             Rule('/', endpoint='list_last_posts'),
+            Rule('/prev/<int:page>', endpoint='list_last_posts'),
             Rule('/page/<int:page_id>', endpoint='show_page'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
             Rule('/rss', endpoint='rss'),

@@ -68,8 +68,8 @@ input {
 }
  
 .footer {
-    position: absolute;
-    bottom: 23px;
+    text-align: center;
+    margin-top: 137px;
 }
 
 .post {

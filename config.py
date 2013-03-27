@@ -14,5 +14,7 @@ class Configuration:
 
         self.username = parser.get("admin", "username")
         self.password = parser.get("admin", "password")
+
+        self.posts_per_page = int(parser.get("settings", "posts_per_page"))
  
         self.database_uri = parser.get("db", "database_uri")

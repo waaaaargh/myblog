@@ -20,9 +20,15 @@ def authenticated(function):
             return redirect('/admin/login')
     return inner
 
-def list_last_posts(request, environment, session):
-    posts = session.query(post).order_by(desc(post.date)).limit(20).all()
-    return render_template("list_posts_lastweek.htmljinja", environment, posts=posts)
+def list_last_posts(request, environment, session, page=0):
+    posts_per_page = environment['blog.config'].posts_per_page
+    
+    posts = session.query(post).order_by(desc(post.date)).offset(page*posts_per_page).limit(posts_per_page).all()
+    older = session.query(post).filter(post.date < posts[len(posts)-1].date).count()
+    newer = session.query(post).filter(post.date > posts[0].date).count()
+
+    return render_template("list_posts_lastweek.htmljinja", environment, page=page, posts=posts, older=older, newer=newer)
+
 
 def post_details(request, environment, session, id):
     post_obj = session.query(post).filter(post.id == id).one()
@@ -68,7 +74,7 @@ Displays a list of all posts
 """
 @authenticated
 def admin_welcome(request, environment, session):
-    posts = session.query(post).all()
+    posts = session.query(post).order_by(desc(post.date)).all()
     pages = session.query(page).all()
     return render_template("admin_welcome.htmljinja", environment, posts=posts, pages=pages) 
 """
