@@ -2,8 +2,11 @@ from datetime import datetime, timedelta
 from sqlalchemy.sql.expression import between, desc
 from werkzeug.utils import redirect 
 
-from util import render_template
-from model import post, page
+from util import render_template, render_form
+from model import post, page, comment
+import forms
+
+
 
 def authenticated(function):
     """
@@ -41,6 +44,25 @@ def rss(request, environment, session):
 def show_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()
     return render_template("show_page.htmljinja", environment, page=page_obj)
+
+def add_comment(request , environment, session, post_id):
+    post_obj = session.query(post).filter(post.id == post_id).one()
+    if request.method == 'POST':
+        form = forms.CommentForm(request.form, captcha={'ip_address': request.remote_addr})
+        if form.validate():
+            c = comment()
+            c.name = form.name.data
+            c.email = form.email.data
+            c.text = form.text.data
+            c.date = datetime.now()
+            post_obj.comments.append(c)
+            session.commit()
+        else:
+            return render_template("post_comment.htmljinja", environment, post=post_obj, form=form)
+        return redirect('/posts/post_'+str(post_id))
+    else:
+        form = forms.CommentForm(captcha={'ip_address': request.remote_addr})
+        return render_template("post_comment.htmljinja", environment, post=post_obj, form=form)
 
 def admin_login(request, environment, session):
     """

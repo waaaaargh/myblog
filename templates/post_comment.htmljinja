@@ -1,0 +1,14 @@
+{% extends "layout.htmljinja" %}
+{% block title %}
+{{post.title}}
+{% endblock %}
+{% block content %}
+{% if post.excerpt != None %}<p>{{post.excerpt}}</p>{% endif%}
+{{post.content}}
+<p><i>{{post.date.strftime("%A, %d. %B %Y, %H:%M").decode('utf-8')}}</i></p>
+<h4>Kommentar schreiben</h4>
+<p align="center">
+{% include "inc_form.htmljinja" %}
+</p>
+
+{% endblock %}

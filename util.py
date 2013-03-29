@@ -22,6 +22,14 @@ def generate_slug(string):
     string = re.sub(' ', '-', string)    
     return string
 
+def render_form(form_obj, action):
+    output  = "<form method='POST' action='"+action+"'>"
+    for field in form_obj:
+        output += '<div>'+str(field.label)+': '+field()+'</div>'
+    output += '<input type="submit">'
+    output += '</form>'
+    return output 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

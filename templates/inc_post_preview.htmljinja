@@ -4,4 +4,5 @@
 {% else %}
     {{post.content}}
 {% endif %}</p>
-<p class="post-date">({{post.date.strftime("%c").decode('utf-8')}})</p>
+<p class="post-numberofcomments">{% if post.comments|count > 0 %} {{ post.comments|count }} Kommentar{% if posts.comments|count > 1 %}e{% endif %} {% else %} Bisher noch keine Kommentare {% endif %}
+<p class="post-date">{{post.date.strftime("%c").decode('utf-8')}}</p>

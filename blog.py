@@ -41,6 +41,7 @@ class Blog(object):
             Rule('/', endpoint='list_last_posts'),
             Rule('/prev/<int:page>', endpoint='list_last_posts'),
             Rule('/page/<int:page_id>', endpoint='show_page'),
+            Rule('/posts/post_<int:post_id>/comment', endpoint='add_comment'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
             Rule('/rss', endpoint='rss'),
             Rule('/admin', endpoint='admin_welcome'),

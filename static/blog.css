@@ -33,6 +33,8 @@ label {
 }
 
 textarea {
+    width: 88%;
+    height: 235px;
     border: 1px solid;
     border-radius: 5px;
 }
@@ -45,6 +47,7 @@ input {
 }
 
 .page {
+    word-wrap: break-word;
     width: 500px;
     margin-left: auto;
     margin-right: auto;

@@ -6,4 +6,8 @@
 {% if post.excerpt != None %}<p>{{post.excerpt}}</p>{% endif%}
 {{post.content}}
 <p><i>{{post.date.strftime("%A, %d. %B %Y, %H:%M").decode('utf-8')}}</i></p>
+<h4 align="center">Kommentare</h4><p align="center"><a href="/posts/post_{{post.id}}/comment">Kommentar schreiben</a><br>~</p>
+<ul>{% for comment in post.comments %}
+<li class="comment"><b>{{ comment.name }}</b>, am {{ comment.date.strftime("%c").decode('utf-8') }}<br> {{ comment.text }}</li>
+{% endfor %}</ul>
 {% endblock %}
