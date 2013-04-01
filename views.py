@@ -6,8 +6,6 @@ from util import render_template, render_form
 from model import post, page, comment
 import forms
 
-
-
 def authenticated(function):
     """
     only executes the decorated function if performed by an authorized user via beaker session
@@ -27,8 +25,11 @@ def list_last_posts(request, environment, session, page=0):
     posts_per_page = environment['blog.config'].posts_per_page
     
     posts = session.query(post).order_by(desc(post.date)).offset(page*posts_per_page).limit(posts_per_page).all()
-    older = session.query(post).filter(post.date < posts[len(posts)-1].date).count()
-    newer = session.query(post).filter(post.date > posts[0].date).count()
+    if len(posts) == 0:
+        older, newer = (0, 0)
+    else:
+        older = session.query(post).filter(post.date < posts[-1].date).count()
+        newer = session.query(post).filter(post.date > posts[0].date).count()
 
     return render_template("list_posts_lastweek.htmljinja", environment, page=page, posts=posts, older=older, newer=newer)
 
@@ -91,30 +92,31 @@ def admin_logout(request, environment, session):
     http_session.delete()
     return {'success': True}
 
-"""
-Displays a list of all posts
-"""
 @authenticated
 def admin_welcome(request, environment, session):
+    """
+    Displays a list of all posts
+    """
     posts = session.query(post).order_by(desc(post.date)).all()
     pages = session.query(page).all()
     return render_template("admin_welcome.htmljinja", environment, posts=posts, pages=pages) 
-"""
-Creates a post.
 
-returns:
-    * success: True if the post has been created successfully
-    * success: False and an errorstring if anything has gone
-        wrong.
-    * success: None, if no action has been performed at all.
-
-errortype may be:
-    * 'MissingTitle' if no title has been passed
-    * 'MissongContent' if no content has been passed
-    * 'BuggyHTML' if something is wrong with the form.
-"""
 @authenticated
 def admin_create_post(request, environment, session):
+    """
+    Creates a post.
+
+    returns:
+        * success: True if the post has been created successfully
+        * success: False and an errorstring if anything has gone
+            wrong.
+        * success: None, if no action has been performed at all.
+
+    errortype may be:
+        * 'MissingTitle' if no title has been passed
+        * 'MissongContent' if no content has been passed
+        * 'BuggyHTML' if something is wrong with the form.
+    """
     if request.method != 'POST':
         return render_template("admin_create_post.htmljinja", environment, success=None)
     else:
@@ -145,25 +147,25 @@ def admin_create_post(request, environment, session):
         session.commit()
         return redirect("/admin") 
 
-"""
-Opens the post <post_id> for editing and saves it.
-
-returns:
-    * success: True if the post has been created successfully
-    * success: False and an errorstring if anything has gone
-        wrong.
-    * success: None, if no action has been performed at all.
-
-errortype may be:
-    * 'MissingTitle' if no title has been passed
-    * 'MissongContent' if no content has been passed
-    * 'BuggyHTML' if something is wrong with the form.
-
-may throw:
-    * 
-"""
 @authenticated
 def admin_edit_post(request, environment, session, post_id):
+        """
+        Opens the post <post_id> for editing and saves it.
+
+        returns:
+            * success: True if the post has been created successfully
+            * success: False and an errorstring if anything has gone
+                wrong.
+            * success: None, if no action has been performed at all.
+
+        errortype may be:
+            * 'MissingTitle' if no title has been passed
+            * 'MissongContent' if no content has been passed
+            * 'BuggyHTML' if something is wrong with the form.
+
+        may throw:
+            * 
+        """
         # get post Object
         post_obj = session.query(post).filter(post.id == post_id).one()
 
@@ -193,39 +195,41 @@ def admin_edit_post(request, environment, session, post_id):
             session.commit()
             return redirect("/admin")
 
-"""
-deletes the post with the id <post_id>.
 
-returns:
+@authenticated
+def admin_delete_post(request, environment, session, post_id):
+    """
+    deletes the post with the id <post_id>.
+
+    returns:
     * success: True if the post has been deleted successfully
     * success: False and an errorstring if anything has gone
         wrong.
-throws:
+    throws:
     * Exception('NoSuchPost') if there is no post with <post_id>
 
-"""
-@authenticated
-def admin_delete_post(request, environment, session, post_id):
+    """
     post_obj = session.query(post).filter(post.id == post_id).one()
     session.delete(post_obj)
     session.commit()
     return redirect("/admin")
-"""
-Creates a page.
 
-returns:
-    * success: True if the page has been created successfully
-    * success: False and an errorstring if anything has gone
-        wrong.
-    * success: None, if no action has been performed at all.
-
-errortype may be:
-    * 'MissingTitle' if no title has been passed
-    * 'MissongContent' if no content has been passed
-    * 'BuggyHTML' if something is wrong with the form.
-"""
 @authenticated
 def admin_create_page(request, environment, session):
+    """
+    Creates a page.
+
+    returns:
+        * success: True if the page has been created successfully
+        * success: False and an errorstring if anything has gone
+            wrong.
+        * success: None, if no action has been performed at all.
+
+    errortype may be:
+        * 'MissingTitle' if no title has been passed
+        * 'MissongContent' if no content has been passed
+        * 'BuggyHTML' if something is wrong with the form.
+    """
     if request.method != 'POST':
         return render_template("admin_create_page.htmljinja", environment, success=None)
     else:
@@ -257,69 +261,69 @@ def admin_create_page(request, environment, session):
         session.commit()
         
         return redirect('/admin')
-"""
-Opens the page <page_id> for editing and saves it.
-
-returns:
-    * success: True if the post has been created successfully
-    * success: False and an errorstring if anything has gone
-        wrong.
-    * success: None, if no action has been performed at all.
-
-errortype may be:
-    * 'MissingTitle' if no title has been passed
-    * 'MissongContent' if no content has been passed
-    * 'BuggyHTML' if something is wrong with the form.
-
-may throw:
-    * 
-"""
 @authenticated
 def admin_edit_page(request, environment, session, page_id):
-        # get page Object
-        page_obj = session.query(page).filter(page.id == page_id).one()
+    """
+    Opens the page <page_id> for editing and saves it.
 
-        if request.method != 'POST':
-            return render_template("admin_edit_page.htmljinja", environment, success=None, page=page_obj)
-        else:
-            try:
-                title = request.form['title'] 
-                content = request.form['content']
-            except KeyError, e:
-                raise Exception('BuggyHTML')
+    returns:
+        * success: True if the post has been created successfully
+        * success: False and an errorstring if anything has gone
+            wrong.
+        * success: None, if no action has been performed at all.
 
-            # check if at least title and content are present.
-            if title == '':
-                return render_template("admin_edit_page.htmljinja", environment,
-                    success=False,
-                    errorstring='MissingTitle',
-                    page=page_obj
-                )
-            if content == '':
-                return render_template("admin_edit_page.htmljinja", environment,
-                    success=False,
-                    errorstring='MissingContent',
-                    page=page_obj
-                )
-            page_obj.title = title
-            page_obj.content = content
+    errortype may be:
+        * 'MissingTitle' if no title has been passed
+        * 'MissongContent' if no content has been passed
+        * 'BuggyHTML' if something is wrong with the form.
 
-            session.commit()
-            return redirect("/admin")
+    may throw:
+        * 
+    """
+    # get page Object
+    page_obj = session.query(page).filter(page.id == page_id).one()
 
-"""
-deletes the page with the id <page_id>.
+    if request.method != 'POST':
+        return render_template("admin_edit_page.htmljinja", environment, success=None, page=page_obj)
+    else:
+        try:
+            title = request.form['title'] 
+            content = request.form['content']
+        except KeyError, e:
+            raise Exception('BuggyHTML')
 
-returns:
-    * success: True if the post has been deleted successfully
-    * success: False and an errorstring if anything has gone
-        wrong.
-throws:
-    * Exception('NoSuchPage') if there is no post with <post_id>
+        # check if at least title and content are present.
+        if title == '':
+            return render_template("admin_edit_page.htmljinja", environment,
+                success=False,
+                errorstring='MissingTitle',
+                page=page_obj
+            )
+        if content == '':
+            return render_template("admin_edit_page.htmljinja", environment,
+                success=False,
+                errorstring='MissingContent',
+                page=page_obj
+            )
+        page_obj.title = title
+        page_obj.content = content
 
-"""
+        session.commit()
+        return redirect("/admin")
+
 @authenticated
 def admin_delete_page(request, environment, session, page_id):
+    """
+    deletes the page with the id <page_id>.
+
+    returns:
+        * success: True if the post has been deleted successfully
+        * success: False and an errorstring if anything has gone
+            wrong.
+    throws:
+        * Exception('NoSuchPage') if there is no post with <post_id>
+
+    """
     page_obj = session.query(page).filter(page.id == page_id).one()
     session.delete(page_obj)
     session.commit()
