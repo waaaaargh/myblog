@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from sqlalchemy.sql.expression import between, desc
-from werkzeug.utils import redirect 
+from werkzeug.utils import redirect
+
+import re
 
 from util import render_template, render_form
 from model import post, page, comment
@@ -14,16 +16,19 @@ def authenticated(function):
     def inner(*args, **kwargs):
         # userame checking goes here
         try:
-            username_session = args[1]['beaker.session']['username']      
+            username_session = args[1]['beaker.session']['username']
             ret = function(*args, **kwargs)
             return ret
         except KeyError, e:
             return redirect('/admin/login')
     return inner
 
+def strip_html(string):
+    return re.sub('<[^<]+?>', '', string)
+
 def list_last_posts(request, environment, session, page=0):
     posts_per_page = environment['blog.config'].posts_per_page
-    
+
     posts = session.query(post).order_by(desc(post.date)).offset(page*posts_per_page).limit(posts_per_page).all()
     if len(posts) == 0:
         older, newer = (0, 0)
@@ -52,9 +57,9 @@ def add_comment(request , environment, session, post_id):
         form = forms.CommentForm(request.form, captcha={'ip_address': request.remote_addr})
         if form.validate():
             c = comment()
-            c.name = form.name.data
-            c.email = form.email.data
-            c.text = form.text.data
+            c.name = strip_html(form.name.data)
+            c.email = strip_html(form.email.data)
+            c.text = strip_html(form.text.data)
             c.date = datetime.now()
             post_obj.comments.append(c)
             session.commit()
@@ -70,7 +75,7 @@ def admin_login(request, environment, session):
     attempt login and write username into session if successfull
     """
     if request.method != 'POST':
-        return render_template("admin_login.htmljinja", environment, success=None) 
+        return render_template("admin_login.htmljinja", environment, success=None)
     else:
         try:
             username = request.form['username']
@@ -84,7 +89,7 @@ def admin_login(request, environment, session):
             http_session.save()
             return redirect("/admin")
         else:
-            return render_template("admin_login.htmljinja", environment, success=False,errorstring='InvalidLogin') 
+            return render_template("admin_login.htmljinja", environment, success=False,errorstring='InvalidLogin')
 
 
 def admin_logout(request, environment, session):
@@ -99,7 +104,7 @@ def admin_welcome(request, environment, session):
     """
     posts = session.query(post).order_by(desc(post.date)).all()
     pages = session.query(page).all()
-    return render_template("admin_welcome.htmljinja", environment, posts=posts, pages=pages) 
+    return render_template("admin_welcome.htmljinja", environment, posts=posts, pages=pages)
 
 @authenticated
 def admin_create_post(request, environment, session):
@@ -121,8 +126,8 @@ def admin_create_post(request, environment, session):
         return render_template("admin_create_post.htmljinja", environment, success=None)
     else:
         try:
-            title = request.form['title'] 
-            excerpt = request.form['excerpt'] 
+            title = request.form['title']
+            excerpt = request.form['excerpt']
             content = request.form['content']
         except KeyError, e:
             raise Exception('BuggyHTML')
@@ -141,11 +146,11 @@ def admin_create_post(request, environment, session):
         new.excerpt = excerpt
         new.content = content
 
-        new.date = datetime.now()        
+        new.date = datetime.now()
 
         session.add(new)
         session.commit()
-        return redirect("/admin") 
+        return redirect("/admin")
 
 @authenticated
 def admin_edit_post(request, environment, session, post_id):
@@ -164,7 +169,7 @@ def admin_edit_post(request, environment, session, post_id):
             * 'BuggyHTML' if something is wrong with the form.
 
         may throw:
-            * 
+            *
         """
         # get post Object
         post_obj = session.query(post).filter(post.id == post_id).one()
@@ -173,8 +178,8 @@ def admin_edit_post(request, environment, session, post_id):
             return render_template("admin_edit_post.htmljinja", environment, success=None, post=post_obj)
         else:
             try:
-                title = request.form['title'] 
-                excerpt = request.form['excerpt'] 
+                title = request.form['title']
+                excerpt = request.form['excerpt']
                 content = request.form['content']
             except KeyError, e:
                 raise Exception('BuggyHTML')
@@ -187,7 +192,7 @@ def admin_edit_post(request, environment, session, post_id):
             # if we don't have an excerpt, we want the field to be not set at all.
             if excerpt == '':
                 excerpt = None
-            
+
             post_obj.title = title
             post_obj.excerpt = excerpt
             post_obj.content = content
@@ -234,19 +239,19 @@ def admin_create_page(request, environment, session):
         return render_template("admin_create_page.htmljinja", environment, success=None)
     else:
         try:
-            title = request.form['title'] 
+            title = request.form['title']
             content = request.form['content']
         except KeyError, e:
             raise Exception('BuggyHTML')
 
         # check if at least title and content are present.
         if title == '':
-            return render_template("admin_create_page.htmljinja", environment, 
+            return render_template("admin_create_page.htmljinja", environment,
                 success=False,
                 errorstring='MissingTitle'
             )
         if content == '':
-            return render_template("admin_create_page.htmljinja", environment, 
+            return render_template("admin_create_page.htmljinja", environment,
                 success=False,
                 errorstring='MissingContent'
         )
@@ -255,11 +260,11 @@ def admin_create_page(request, environment, session):
         new.title = title
         new.content = content
 
-        new.lastmodified = datetime.now()        
+        new.lastmodified = datetime.now()
 
         session.add(new)
         session.commit()
-        
+
         return redirect('/admin')
 @authenticated
 def admin_edit_page(request, environment, session, page_id):
@@ -278,7 +283,7 @@ def admin_edit_page(request, environment, session, page_id):
         * 'BuggyHTML' if something is wrong with the form.
 
     may throw:
-        * 
+        *
     """
     # get page Object
     page_obj = session.query(page).filter(page.id == page_id).one()
@@ -287,7 +292,7 @@ def admin_edit_page(request, environment, session, page_id):
         return render_template("admin_edit_page.htmljinja", environment, success=None, page=page_obj)
     else:
         try:
-            title = request.form['title'] 
+            title = request.form['title']
             content = request.form['content']
         except KeyError, e:
             raise Exception('BuggyHTML')
