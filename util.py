@@ -1,4 +1,5 @@
 from werkzeug.wrappers import Response
+from wtforms import BooleanField
 import re
 
 def render_template(template_name, environment, mimetype='text/html', **kwargs):
@@ -19,7 +20,7 @@ def generate_slug(string):
     string = re.sub(r'\W+', ' ', string.lower())
     string = string.strip()
 
-    string = re.sub(' ', '-', string)    
+    string = re.sub(' ', '-', string)
     return string
 
 def render_form(form_obj, action):
@@ -28,7 +29,11 @@ def render_form(form_obj, action):
         output += '<div>'+str(field.label)+': '+field()+'</div>'
     output += '<input type="submit">'
     output += '</form>'
-    return output 
+    return output
+
+def add_categories_to_form(form, categories):
+    for c in categories:
+        setattr(form, "cat_%i" % c.id, BooleanField(c.name, []))
 
 if __name__ == '__main__':
     import doctest

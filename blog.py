@@ -35,7 +35,7 @@ class Blog(object):
         self.jinja_env = Environment(
             loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')),
         )
-        
+
         # rules for URLs
         self.url_map = Map([
             Rule('/', endpoint='list_last_posts'),
@@ -43,6 +43,8 @@ class Blog(object):
             Rule('/page/<int:page_id>', endpoint='show_page'),
             Rule('/posts/post_<int:post_id>/comment', endpoint='add_comment'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
+            Rule('/categories', endpoint="show_category_list"),
+            Rule('/categories/<string:category_name>', endpoint="show_category_posts"),
             Rule('/rss', endpoint='rss'),
             Rule('/admin', endpoint='admin_welcome'),
             Rule('/admin/logout', endpoint='admin_logout'),
@@ -53,7 +55,10 @@ class Blog(object):
             Rule('/admin/pages/create', endpoint='admin_create_page'),
             Rule('/admin/pages/edit/<int:page_id>', endpoint='admin_edit_page'),
             Rule('/admin/pages/delete/<int:page_id>', endpoint='admin_delete_page'),
-        ])
+            Rule('/admin/categories/create', endpoint='admin_create_category'),
+            Rule('/admin/categories/edit/<int:category_id>', endpoint='admin_edit_page'),
+            Rule('/admin/categories/delete/<int:category_id>', endpoint='admin_delete_category'),
+ ])
 
     """
     handle incoming WSGI requests.
@@ -61,11 +66,11 @@ class Blog(object):
     def handle_request(self, environment, start_response):
         # wsgi janitoring
         request = Request(environment)
-        adapter = self.url_map.bind_to_environ(request.environ)    
+        adapter = self.url_map.bind_to_environ(request.environ)
         endpoint, values = adapter.match()
-        
+
         # prepare sqlalchemy session
-        session = self.session_factory()        
+        session = self.session_factory()
 
         # put config and jinja environment in environment variable
         environment['blog.config'] = self.config
@@ -73,8 +78,8 @@ class Blog(object):
 
         # execute views
         response = getattr(views, endpoint)(request, environment, session, **values)
-        return response(environment, start_response) 
-    
+        return response(environment, start_response)
+
     """
     redirect incoming WSGI requests to handle_request
     """
@@ -83,14 +88,14 @@ class Blog(object):
 
 def create_app(config_path='blog.cfg', with_static=True):
     app = Blog(config_path)
-    
+
     # adds static directory serving if needed
-    #   In production content, leave the web serving 
-    #   to the _real_ web server instead of the 
+    #   In production content, leave the web serving
+    #   to the _real_ web server instead of the
     #   werkzeug middleware.
     app = SessionMiddleware(app)
     app = SharedDataMiddleware(app, {'/static': 'static'})
-    
+
     return app
 
 if __name__ == '__main__':
@@ -99,6 +104,6 @@ if __name__ == '__main__':
 
     # actions for argv
     action_runserver = script.make_runserver(create_app, use_debugger=True, use_reloader=True)
-    action_initdb = lambda: model.initdb(Blog(config_path='blog.cfg').engine) 
-    action_shell = script.make_shell(lambda: {'blog': Blog(config_path='blog.cfg')}) 
-    script.run()
+    action_initdb = lambda: model.initdb(Blog(config_path='blog.cfg').engine)
+    action_shell = script.make_shell(lambda: {'blog': Blog(config_path='blog.cfg')})
+script.run()
