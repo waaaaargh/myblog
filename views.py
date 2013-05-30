@@ -74,7 +74,18 @@ def rss(request, environment, session):
     posts = session.query(post).limit(20)
     return render_template("rss.htmljinja", environment,
                            mimetype='application/rss+xml', posts=posts)
+   
 
+def category_rss(request, environment, session, category_name):
+    try:
+        category_obj = session.query(category).filter(category.name ==
+                category_name).one()
+    except NoResultFound:
+        raise Exception("No Such Category")
+
+    return render_template("rss.htmljinja", environment,
+                           mimetype="text/plain",
+                           posts=category_obj.posts)
 
 def show_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()

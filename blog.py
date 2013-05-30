@@ -44,6 +44,8 @@ class Blog(object):
             Rule('/posts/post_<int:post_id>/comment', endpoint='add_comment'),
             Rule('/posts/post_<int:id>', endpoint='post_details'),
             Rule('/categories', endpoint="show_category_list"),
+            Rule('/categories/<string:category_name>/rss',
+                endpoint="category_rss"),
             Rule('/categories/<string:category_name>', endpoint="show_category_posts"),
             Rule('/rss', endpoint='rss'),
             Rule('/admin', endpoint='admin_welcome'),
