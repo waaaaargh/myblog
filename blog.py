@@ -52,6 +52,7 @@ class Blog(object):
             Rule('/admin/posts/create', endpoint='admin_create_post'),
             Rule('/admin/posts/edit/<int:post_id>', endpoint='admin_edit_post'),
             Rule('/admin/posts/delete/<int:post_id>', endpoint='admin_delete_post'),
+            Rule('/admin/comments/delete/<int:comment_id>', endpoint='admin_delete_comment'),
             Rule('/admin/pages/create', endpoint='admin_create_page'),
             Rule('/admin/pages/edit/<int:page_id>', endpoint='admin_edit_page'),
             Rule('/admin/pages/delete/<int:page_id>', endpoint='admin_delete_page'),

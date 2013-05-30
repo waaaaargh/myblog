@@ -1,0 +1,13 @@
+{% extends "layout.htmljinja" %}
+
+{% block title %}
+    Kategorien
+{% endblock %}
+
+{% block content %}
+    <ul>
+        {% for c in categories %}
+            <li><a href="/categories/{{c.name}}">{{ c.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

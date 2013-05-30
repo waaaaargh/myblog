@@ -9,25 +9,16 @@
     var inputarea;
 
     function source() {
-        inputarea = inputarea.removeInstance('inputarea');
+        inputarea = inputarea.removeInstance('content');
     }
 
     function visual() {
-        inputarea =  new nicEditor({fullPanel : true, iconsPath : '/static/nicedit/nicEditorIcons.gif'}).panelInstance('inputarea',{hasPanel : true});
+        inputarea =  new nicEditor({fullPanel : true, iconsPath : '/static/nicedit/nicEditorIcons.gif'}).panelInstance('content',{hasPanel : true});
     }
 
     </script>
-    <form method="POST" action="">
-        <input type="text" name="title"><br>
-        <input type="text" name="excerpt"><br>
-        <textarea name="content" style="width: 100%; height: 400px;" id="inputarea"></textarea><br>
-        <a href="#" onclick="visual();">visual</a> <a href="#" onclick="source();">source</a>&nbsp;
-        <input type="submit">
-    </form>
-    {% if success==True%}
-        Post successfull 
-    {% elif success==None %}
-    {% else %}
-        Error on adding Post: {{errorstring}}
-    {% endif %}
+
+    {% include "inc_form.htmljinja" %}
+
+    <a href="#" onclick="visual();">visual</a> <a href="#" onclick="source();">source</a>&nbsp;
 {% endblock %}

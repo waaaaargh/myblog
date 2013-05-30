@@ -461,3 +461,14 @@ def admin_delete_category(request, environment, session, category_id):
     except NoResultFound:
         pass
     return redirect('/admin')
+
+
+@authenticated
+def admin_delete_comment(request, environment, session, comment_id):
+    try:
+        comment_obj = session.query(comment).filter(comment.id == comment_id).one()
+        session.delete(comment_obj)
+        session.commit()
+        return redirect('/admin')
+    except NoResultFound:
+        pass
