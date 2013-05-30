@@ -2,9 +2,9 @@
 <rss version="2.0">
 
 <channel>
-  <title>Hannes' Blog</title>
-  <link>http://blog.weltraumpflege.org</link>
-  <description>Dem Hannes sein Blog</description>
+    <title>{{ feed_title }}</title>
+    <link>{{ feed_link }}</link>
+  <description>{{ feed_description }}</description>
   {% for post in posts %}
   <item>
     <title>{{post.title}}</title>

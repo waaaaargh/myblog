@@ -73,7 +73,10 @@ def show_category_posts(request, environment, session, category_name):
 def rss(request, environment, session):
     posts = session.query(post).limit(20)
     return render_template("rss.htmljinja", environment,
-                           mimetype='application/rss+xml', posts=posts)
+                           mimetype='application/rss+xml', posts=posts,
+                           feed_title='Johannes\' Blog',
+                           feed_link='http://blog.weltraumpflege.org',
+                           feed_description='Dem Hannes sein Blog')
    
 
 def category_rss(request, environment, session, category_name):
@@ -84,8 +87,14 @@ def category_rss(request, environment, session, category_name):
         raise Exception("No Such Category")
 
     return render_template("rss.htmljinja", environment,
-                           mimetype="text/plain",
-                           posts=category_obj.posts)
+                           mimetype='application/rss+xml', 
+                           posts=category_obj.posts,
+                           feed_title='Johannes\' Blog - Kategorie ' +\
+                                      category_obj.name,
+                           feed_link='http://blog.weltraumpflege.org/category/'+\
+                                     category_obj.name,
+                           feed_description='Dem Hannes sein Blog')
+   
 
 def show_page(request, environment, session, page_id):
     page_obj = session.query(page).filter(page.id == page_id).one()
