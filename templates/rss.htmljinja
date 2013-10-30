@@ -7,9 +7,9 @@
   <description>{{ feed_description }}</description>
   {% for post in posts %}
   <item>
-    <title>{{post.title}}</title>
+    <title><![CDATA[{{post.title}}]]></title>
     <link>http://blog.weltraumpflege.org/posts/post_{{post.id}}</link>
-    <description>{% if post.excerpt %}{{post.excerpt}}{% else %}{{post.content|striptags}}{% endif %}</description>
+    <description><![CDATA[{% if post.excerpt %}{{post.excerpt}}{% else %}{{post.content|striptags}}{% endif %}]]></description>
   </item>
   {% endfor %}
 </channel>
