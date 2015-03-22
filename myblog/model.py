@@ -1,59 +1,48 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from myblog import db
 
-Base = declarative_base()
-
-post_is_in_category = Table('association', Base.metadata,
-                            Column('post_id', Integer,
-                                   ForeignKey('posts.id')),
-                            Column('category_id', Integer,
-                                   ForeignKey('categories.id'))
-                            )
+post_is_in_category = db.Table('association', db.metadata,
+                               db.Column('post_id', db.Integer,
+                                         db.ForeignKey('posts.id')),
+                               db.Column('category_id', db.Integer,
+                                         db.ForeignKey('categories.id'))
+)
 
 
-class category(Base):
+class category(db.Model):
     __tablename__ = 'categories'
-    id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
-    posts = relationship("post", secondary=post_is_in_category)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
+    posts = db.relationship("post", secondary=post_is_in_category)
 
     def __init__(self, name):
         self.name = name
 
 
-class post(Base):
+class post(db.Model):
     __tablename__ = 'posts'
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    excerpt = Column(String)
-    content = Column(String)
-    date = Column(DateTime)
-    categories = relationship("category", secondary=post_is_in_category,
-                              backref='categories')
-    comments = relationship("comment", backref="posts")
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    excerpt = db.Column(db.String)
+    content = db.Column(db.String)
+    date = db.Column(db.DateTime)
+    categories = db.relationship("category", secondary=post_is_in_category,
+                                 backref='categories')
+    comments = db.relationship("comment", backref="posts")
 
 
-class page(Base):
+class page(db.Model):
     __tablename__ = 'pages'
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    content = Column(String)
-    lastmodified = Column(DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    content = db.Column(db.String)
+    lastmodified = db.Column(db.DateTime)
 
 
-class comment(Base):
+class comment(db.Model):
     __tablename__ = 'comments'
-    id = Column(Integer, primary_key=True)
-    post_id = Column(Integer, ForeignKey("posts.id"))
-    date = Column(DateTime)
-    name = Column(String)
-    email = Column(String)
-    text = Column(String)
-
-
-def initdb(engine):
-    """
-    Creates all the tables in the <engine> database.
-    """
-    Base.metadata.create_all(bind=engine)
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    date = db.Column(db.DateTime)
+    name = db.Column(db.String)
+    email = db.Column(db.String)
+    text = db.Column(db.String)
