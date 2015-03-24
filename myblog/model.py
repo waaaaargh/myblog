@@ -20,6 +20,7 @@ class post(db.Model):
     date = db.Column(db.DateTime)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     comments = db.relationship("comment", backref="post")
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self):
         db.Model.__init__(self)
@@ -33,3 +34,14 @@ class comment(db.Model):
     name = db.Column(db.String)
     email = db.Column(db.String)
     text = db.Column(db.String)
+
+class user(db.Model):
+    __tablename__ = "user"
+    def __repr__(self):
+        return self.name
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, unique=True)
+    name = db.Column(db.String, unique=True)
+    passwordhash = db.Column(db.String, unique=False)
+    posts = db.relationship('post', backref="owner")
+    
