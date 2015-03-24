@@ -1,15 +1,15 @@
 {% extends "layout.htmljinja" %}
 
 {% block title %}
-Kategorie: {{ category_name }}
+Kategorie: {{ category.name }}
 {% endblock %}
 
 {% block content %}
 <ul class="postlist">
-{% if posts|count == 0 %}
+{% if category.posts|count == 0 %}
 <center>Fehler: Keine Posts anzuzeigen.</center>
 {% endif %}
-{% for post in posts %}
+{% for post in category.posts %}
 <li class="post">{% include "inc_post_preview.htmljinja" %}</li>
 {% endfor %}
 {% endblock %}
