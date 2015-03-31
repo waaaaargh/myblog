@@ -1,0 +1,5 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+<strong>ohai, {{ current_user.name }}.</strong>
+<a href="{{ url_for('.logout') }}" class="btn btn-primary btn-small">logout</a>
+{% endblock body %}
