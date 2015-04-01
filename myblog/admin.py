@@ -52,9 +52,37 @@ class AuthenticatedModelView(ModelView):
 class AuthenticatedFileAdmin(FileAdmin):
     def is_accessible(self):
         return login.current_user.is_authenticated()
-
 class PostView(AuthenticatedModelView):
     form_excluded_columns = ['date', 'comments']
+    column_list = ['title', 'owner']
+    
+    def scaffold_form(self):
+        class TinyMCEField(wtforms.TextAreaField):
+            def __call__(self, *args, **kwargs):
+                nicedit_snippet = \
+"""
+<br />
+<script type="text/javascript" src="/static/nicedit/nicEdit.js"></script>
+<script>
+  var inputarea;
+  function source() {
+    inputarea = inputarea.removeInstance('content');
+  }
+  function visual() {
+    inputarea = new nicEditor({fullPanel : true, iconsPath : '/static/nicedit/nicEditorIcons.gif'}).panelInstance('content',{hasPanel : true});
+  }
+</script>
+<button type="button" class="btn btn-default" onclick="visual();">WYSIWYG</button> 
+<button type="button" class="btn btn-default" onclick="source();">Code</button>
+"""
+                ta_code = wtforms.TextAreaField.__call__(
+                    self, *args, style="width: 600px; height: 400px;", **kwargs)
+                return ta_code + nicedit_snippet
+
+        form_class = super(PostView, self).scaffold_form()
+        form_class.content = TinyMCEField('Post')
+        return form_class
+
 admin.add_view(PostView(model.post, db.session))
 
 class CategoryView(AuthenticatedModelView):
