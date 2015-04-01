@@ -62,7 +62,8 @@ class CategoryView(AuthenticatedModelView):
 admin.add_view(CategoryView(model.category, db.session))
 
 class CommentView(AuthenticatedModelView):
-    pass
+    can_edit = False
+    can_create = False
 admin.add_view(CommentView(model.comment, db.session))
 
 #class UserView(ModelView):
@@ -74,7 +75,6 @@ class UserView(AuthenticatedModelView):
         form_class = super(UserView, self).scaffold_form()
         form_class.password = wtforms.PasswordField('New Password')
         return form_class
-        
     
     def on_model_change(self, form, model):
         if len(form.password.data) > 0:
