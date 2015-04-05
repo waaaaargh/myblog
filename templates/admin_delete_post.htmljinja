@@ -1,7 +1,0 @@
-{% extends "layout.htmljinja" %}
-{% block title %}
-Post has been deleted uccessfully!
-{% endblock %}
-{% block content%}
-<a href="/admin">[back]</a>
-{% endblock %}

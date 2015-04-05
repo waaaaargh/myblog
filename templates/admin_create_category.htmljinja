@@ -1,8 +1,0 @@
-{% extends "layout.htmljinja" %}
-{% block title %}
-    Add Category
-{% endblock %}
-
-{% block content %}
-    {% include "inc_form.htmljinja" %}
-{% endblock %}
