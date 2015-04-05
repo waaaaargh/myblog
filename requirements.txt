@@ -3,3 +3,4 @@ flask-sqlalchemy
 flask-script
 flask-admin
 flask-login
+flask-wtf
