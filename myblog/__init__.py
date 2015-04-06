@@ -7,9 +7,7 @@ base_path = abspath(join(dirname(__file__), ".."))
 
 app = Flask(__name__, template_folder=join(base_path, "templates"),
             static_folder=join(base_path, "static"))
-
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///"+join(base_path, "myblog.sqlite")
-app.secret_key = "topkek"
+app.config.from_pyfile(join(base_path, "myblog.cfg"))
 
 db = SQLAlchemy(app)
 
