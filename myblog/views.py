@@ -13,7 +13,7 @@ def redirect_to_recent_posts():
 def show_posts(page_number):
     posts_per_page = 5
     posts = model.post.query.\
-            order_by(model.post.date).\
+            order_by(model.post.date.desc()).\
             offset(page_number * posts_per_page).\
             limit(posts_per_page).\
             all()
