@@ -3,7 +3,7 @@
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss" />
         <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="/static/blog.css" type="text/css">
-        <title>Hannes' Blog</title>
+        <title>wrghblg</title>
     </head>
 
     <body>
@@ -12,18 +12,20 @@
         <!-- end github spam -->
 
         <div class="page">
-        <h1>Hannes' Blog</h1>
+        <h1>wrghblg</h1>
         <div class="subtitle">
-		<p>the inner workings of an unconventional mind.</p>
+		<p>
+		  though a stranger, you can rest here for a while<br />
+		  but save your energy, your journey here is far from over.
+		</p>
 		<p><img width="100px" height="120px" src="/static/kallisti.png"></p>
 	</div>
-        <div class="pagelist">Fragen? Antworten!</div>
         <div class="heading"><h2>{% block title %} {% endblock %}</h2></div>
         <div class="content">
         {% block content %}
         {% endblock %}
         </div>
-        <div class="footer"><a href="/static/bydon.png">Bydon Bowerd :DDDDD</a> ~ <a href="http://twitter.com/waaaaargh">twitter</a> ~ <a href="http://waaaaargh.soup.io">soup.io</a></div>
+        <div class="footer"><a href="http://twitter.com/waaaaargh">twitter</a> ~ <a href="http://waaaaargh.soup.io">soup.io</a></div>
         </div>
     </body>
 </html>
