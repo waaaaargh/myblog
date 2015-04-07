@@ -12,4 +12,11 @@
 <li class="post">{% include "inc_post_preview.htmljinja" %}</li>
 {% endfor %}
 </ul>
+
+<center>
+
+{% if not last_page %} <a href="{{ page_number + 1 }}">older posts</a> {% endif %} {% if ( not first_page and not last_page ) %} | {% endif %} {% if not first_page %} <a href="{{ page_number - 1}}">newer posts</a> {% endif %}
+
+</center>
+
 {% endblock %}

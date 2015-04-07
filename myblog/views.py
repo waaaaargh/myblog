@@ -9,7 +9,7 @@ from datetime import datetime
 def redirect_to_recent_posts():
     return redirect('/posts/recent/0')
 
-@app.route('/posts/recent/<int:page_number>', defaults={'page_number': 0})
+@app.route('/posts/recent/<int:page_number>')
 def show_posts(page_number):
     posts_per_page = 5
     posts = model.post.query.\
@@ -17,7 +17,16 @@ def show_posts(page_number):
             offset(page_number * posts_per_page).\
             limit(posts_per_page).\
             all()
-    return render_template('list_posts_lastweek.htmljinja', posts=posts)
+    number_of_posts = model.post.query.count()
+    
+    last_page = number_of_posts - ( ( page_number + 1 ) * posts_per_page ) < posts_per_page
+    first_page = ( page_number == 0 )
+    
+    
+    return render_template('list_posts_lastweek.htmljinja', posts=posts,
+                           last_page=last_page, 
+                           first_page=first_page, 
+                           page_number=page_number)
 
 @app.route('/posts/<int:post_id>', defaults={'slug': ''})
 def single_post_view(post_id, slug):
