@@ -1,9 +1,11 @@
 from myblog import app, db, model
-from flask import render_template, redirect, request
+from flask import render_template, redirect, request, Response
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from datetime import datetime
+
+from werkzeug.contrib.atom import AtomFeed
 
 @app.route('/')
 def redirect_to_recent_posts():
@@ -79,3 +81,13 @@ def show_category_posts(category_name):
         return "Category not found", 404
 
     return render_template('show_category_posts.htmljinja', category=category)
+    
+@app.route('/feeds/recent.atom')
+def recent_feed_atom():
+    feed = AtomFeed("wrghblg", 
+                    feed_url=request.url, 
+                    url=request.host_url)
+    for post in model.post.query.order_by(model.post.date.desc()).limit(10).all():
+        feed.add(post.title, post.content, content_type="html", id=post.id, updated=post.date)
+    return feed.get_response()
+    
